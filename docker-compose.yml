@@ -1,0 +1,18 @@
+name: python-final
+
+
+services:
+  db_postgresql:
+    container_name: postgres_app
+    build: ./DB
+    restart: always
+    ports:
+      - ${DB_PORT_IN}:${DB_PORT_OUT}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=${DB_NAME_DB}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+volumes:
+  postgres_data:
