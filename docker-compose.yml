@@ -14,5 +14,13 @@ services:
       - POSTGRES_DB=${DB_NAME_DB}
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
+  data_generator:
+    container_name: data_generator_app
+    build:
+      context: ./
+      dockerfile: ./_CI/generator/Dockerfile
+    depends_on:
+      - db_postgresql
+
 volumes:
   postgres_data:
