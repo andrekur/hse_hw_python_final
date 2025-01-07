@@ -1,3 +1,5 @@
+GRANT ALL PRIVILEGES ON *.* TO 'test_user'@'%';
+
 CREATE TABLE IF NOT EXISTS Users (
     user_id INT PRIMARY KEY AUTO_INCREMENT,
     first_name VARCHAR(50),
