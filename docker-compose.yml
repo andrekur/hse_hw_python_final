@@ -4,7 +4,7 @@ name: python-final
 services:
   db_postgresql:
     container_name: postgres_app
-    build: ./DB
+    build: ./_CI/db
     restart: always
     ports:
       - ${DB_PORT_IN}:${DB_PORT_OUT}
