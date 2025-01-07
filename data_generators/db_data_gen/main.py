@@ -11,11 +11,11 @@ CONFIG = dotenv_values('./.env')
 CONNECTION = DatabaseCursor(
   2,
   10,
-  user=CONFIG['DB_USER'],
-  password=CONFIG['DB_PASSWORD'],
-  host=CONFIG['DB_HOST'],
-  port=CONFIG['DB_PORT'],
-  database=CONFIG['DB_NAME_DB']
+  user=CONFIG['DB_POSTGRES_USER'],
+  password=CONFIG['DB_POSTGRES_PASSWORD'],
+  host=CONFIG['DB_POSTGRES_HOST'],
+  port=CONFIG['DB_POSTGRES_PORT'],
+  database=CONFIG['DB_POSTGRES_NAME_DB']
 )
 
 if __name__ == '__main__':

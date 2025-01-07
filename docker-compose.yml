@@ -4,16 +4,31 @@ name: python-final
 services:
   db_postgresql:
     container_name: postgres_app
-    build: ./_CI/db
+    build: ./_CI/db/postgresql
     restart: always
     ports:
-      - ${DB_PORT_IN}:${DB_PORT_OUT}
+      - ${DB_POSTGRES_PORT_IN}:${DB_POSTGRES_PORT_OUT}
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_DB=${DB_NAME_DB}
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_POSTGRES_NAME_DB}
+      - POSTGRES_USER=${DB_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${DB_POSTGRES_PASSWORD}
+
+  db_mysql:
+    container_name: mysql_app
+    build: ./_CI/db/mysql
+    restart: always
+    ports:
+      - ${DB_MYSQL_PORT_IN}:${DB_MYSQL_PORT_OUT}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_POSTGRES_PASSWORD}
+      - MYSQL_DATABASE=${DB_POSTGRES_NAME_DB}
+      - MYSQL_USER=${DB_POSTGRES_USER}
+      - MYSQL_PASSWORD=${DB_POSTGRES_PASSWORD}
+
   data_generator:
     container_name: data_generator_app
     build:
@@ -24,3 +39,4 @@ services:
 
 volumes:
   postgres_data:
+  mysql_data:
