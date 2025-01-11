@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS "Products" (
     price DECIMAL(10, 2) NOT NULL,
     stock_quantity INT NOT NULL,
     creation_date TIMESTAMP NOT NULL,
-    FOREIGN KEY (category_id) REFERENCES "ProductCategories" (category_id)
+    FOREIGN KEY (category_id) REFERENCES "ProductCategories" (category_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS "Orders" (
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS "Orders" (
     total_amount DECIMAL(10, 2) NOT NULL,
     status VARCHAR(20) NOT NULL,
     delivery_date TIMESTAMP NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES "Users" (user_id)
+    FOREIGN KEY (user_id) REFERENCES "Users" (user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS "OrderDetails" (
@@ -42,6 +42,6 @@ CREATE TABLE IF NOT EXISTS "OrderDetails" (
     quantity INT NOT NULL,
     price_per_unit DECIMAL(10, 2) NOT NULL,
     total_price DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (order_id) REFERENCES "Orders" (order_id),
-    FOREIGN KEY (product_id) REFERENCES "Products" (product_id)
+    FOREIGN KEY (order_id) REFERENCES "Orders" (order_id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES "Products" (product_id) ON DELETE CASCADE
 );
