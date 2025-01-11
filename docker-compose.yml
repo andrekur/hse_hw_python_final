@@ -1,5 +1,21 @@
 name: python-final
 
+x-airflow-common:
+  &airflow-common
+  environment:
+    &airflow-common-env
+    AIRFLOW__WEBSERVER__SECRET_KEY: 5ZCItDTk9potGwfrUCa6ceeFCqhvWCxP
+    AIRFLOW__CORE__EXECUTOR: SequentialExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: sqlite:////usr/local/airflow/db/airflow.db
+    AIRFLOW__CORE__LOAD_EXAMPLES: False
+
+x-common:
+  &common-volumes
+  volumes:
+    - ./airflow/dags:/opt/airflow/dags
+    - ./airflow/spark_scripts:/opt/airflow/scripts
+    - spark:/opt/spark
+    - airflow:/usr/local/airflow/db/:rw 
 
 services:
   db_postgresql:
@@ -43,8 +59,7 @@ services:
       dockerfile: ./_CI/airflow/init/Dockerfile
     restart: "no"
     environment:
-      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////usr/local/airflow/db/airflow.db
+      <<: *airflow-common-env
     volumes:
       - airflow:/usr/local/airflow/db/:rw
 
@@ -52,13 +67,8 @@ services:
     image: apache/airflow:2.10.4-python3.12
     restart: always
     environment:
-      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////usr/local/airflow/db/airflow.db
-      - AIRFLOW__CORE__LOAD_EXAMPLES=False
-    volumes:
-      - ./airflow/dags:/opt/airflow/dags
-      - ./airflow/spark_scripts:/opt/airflow/scripts
-      - airflow:/usr/local/airflow/db:rw
+      <<: *airflow-common-env
+    <<: *common-volumes
     ports:
       - "8080:8080"
     depends_on:
@@ -72,13 +82,8 @@ services:
       dockerfile: ./_CI/airflow/scheduler/Dockerfile
     restart: always
     environment:
-      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////usr/local/airflow/db/airflow.db
-      - AIRFLOW__CORE__LOAD_EXAMPLES=False
-    volumes:
-      - ./airflow/dags:/opt/airflow/dags
-      - ./airflow/spark_scripts:/opt/airflow/scripts
-      - airflow:/usr/local/airflow/db/:rw
+      <<: *airflow-common-env
+    <<: *common-volumes
     depends_on:
       - airflow-init
 
@@ -90,10 +95,7 @@ services:
       - SPARK_MASTER_WEBUI_PORT=8081
     ports:
       - "8081:8081"
-    volumes:
-      - ./airflow/dags:/opt/airflow/dags
-      - ./airflow/spark_scripts:/opt/airflow/scripts
-      - spark:/opt/spark
+    <<: *common-volumes
 
   spark-worker:
     image: bitnami/spark:3.5.3
@@ -101,10 +103,7 @@ services:
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark:7077
-    volumes:
-      - ./airflow/dags:/opt/airflow/dags
-      - ./airflow/spark_scripts:/opt/airflow/scripts
-      - spark:/opt/spark
+    <<: *common-volumes
     depends_on:
       - spark
 

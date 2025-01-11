@@ -17,11 +17,13 @@ RUN mkdir -p /opt/airflow/spark/jars
 RUN curl -o /opt/airflow/spark/jars/postgresql-42.2.18.jar https://jdbc.postgresql.org/download/postgresql-42.2.18.jar && \
     curl -o /opt/airflow/spark/jars/mysql-connector-java-8.3.0.jar https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.3.0/mysql-connector-j-8.3.0.jar
 
+COPY ./_CI/airflow/scheduler/requirements.txt requirements.txt
+COPY .env .env
+
 USER airflow
 
-COPY ./_CI/airflow/scheduler/requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 ENV PYTHONPATH="/opt/airflow/scripts" 
 
-# Entrypoint
+
 CMD ["scheduler"]

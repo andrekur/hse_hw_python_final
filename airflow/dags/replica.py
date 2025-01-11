@@ -16,27 +16,28 @@ DEFAULT_ARGS = {
 }
 
 with DAG(
-    'replicate',
+    'replicate_tables',
     default_args=DEFAULT_ARGS,
-    description='Name',
+    description='Replica from PostgreSQL to MySQL',
     schedule_interval=timedelta(days=1),
 ) as dag:
-  TABLES = ["Users",]
+  tables = ('Users', 'ProductCategories', 'Products', 'Orders', 'OrderDetails', )
 
-  # EmptyOperator для начала и конца DAG
   start = EmptyOperator(task_id='start')
   finish = EmptyOperator(task_id='finish')
 
-  for table in TABLES:
+  for table in tables:
       # Параметры подключения
       spark_submit_task = SparkSubmitOperator(
           task_id=f'replicate_{table}',
-          application='/opt/airflow/scripts/replica_table.py',
+          application='/opt/airflow/scripts/replicate_table.py',
           conn_id='spark_app',
-          application_args=[],
+          application_args=[
+            table
+          ],
           conf={
-              "spark.driver.memory": "300m",
-              "spark.executor.memory": "300m"
+              "spark.driver.memory": "600m",
+              "spark.executor.memory": "600m"
           },
           jars='/opt/airflow/spark/jars/postgresql-42.2.18.jar,/opt/airflow/spark/jars/mysql-connector-java-8.3.0.jar'
       )

@@ -23,8 +23,7 @@ CREATE TABLE IF NOT EXISTS Products (
     category_id INT NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
     stock_quantity INT NOT NULL,
-    creation_date TIMESTAMP NOT NULL,
-    FOREIGN KEY (category_id) REFERENCES ProductCategories (category_id)
+    creation_date TIMESTAMP NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS Orders (
@@ -33,8 +32,7 @@ CREATE TABLE IF NOT EXISTS Orders (
     order_date TIMESTAMP NOT NULL,
     total_amount DECIMAL(10, 2) NOT NULL,
     status VARCHAR(20) NOT NULL,
-    delivery_date TIMESTAMP NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES Users (user_id)
+    delivery_date TIMESTAMP NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS OrderDetails (
@@ -43,7 +41,5 @@ CREATE TABLE IF NOT EXISTS OrderDetails (
     product_id INT NOT NULL,
     quantity INT NOT NULL,
     price_per_unit DECIMAL(10, 2) NOT NULL,
-    total_price DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (order_id) REFERENCES Orders (order_id),
-    FOREIGN KEY (product_id) REFERENCES Products (product_id)
+    total_price DECIMAL(10, 2) NOT NULL
 );
