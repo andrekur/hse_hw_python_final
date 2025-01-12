@@ -5,13 +5,12 @@ source .env
 airflow db init
 
 airflow users create \
-  --username admin \
-  --firstname andre \
-  --lastname kurepin \
-  --role Admin \
-  --email andrekur@yandex.ru \
-  --password my_secret_pass
-
+  --username ${AIRFLOW_WEB_USERNAME} \
+  --firstname ${AIRFLOW_WEB_FIRSTNAME} \
+  --lastname ${AIRFLOW_WEB_LASTNAME} \
+  --role ${AIRFLOW_WEB_ROLE} \
+  --email ${AIRFLOW_WEB_EMAIL} \
+  --password ${AIRFLOW_WEB_PASSWD}
 
 airflow connections add 'postgres_app' \
     --conn-type 'postgres' \
@@ -32,5 +31,5 @@ airflow connections add 'mysql_app' \
 airflow connections add 'spark_app' \
     --conn-type 'spark' \
     --conn-host 'spark://spark' \
-    --conn-port 7077 \
+    --conn-port ${SPARK_PORT} \
     --conn-extra '{"deploy_mode": "client"}'

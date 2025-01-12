@@ -32,27 +32,34 @@ class BaseFakeGenClass:
 	def insert_in_db(self, cur, data):
 		# не совсем безопасно, но мы аккуратно
 		result_ids = []
-		for item in data:
-			_columns = ','.join(str(val) for val in self.fields)
+		for i in range(0, len(data), 1000):
+			end = i + 1000 if i + 1000 + 1 < len(data) else len(data) - 1
+			batch = data[i:end]
 
-			_insert_data = ''
-			for key in self.fields:
-				val = item[key]
-				if type(val) is str:
-					_insert_data += f"'{val}',"
-				elif type(val) is dt or type(val) is date:
-					_insert_data += f"'{val.strftime('%Y-%m-%d')}',"
-				else:
-					_insert_data += f"{val},"
-			_insert_data = _insert_data[:-1]
+			data_to_insert = ''
+			for item in batch:
+				_columns = ','.join(str(val) for val in self.fields)
 
-			print( f'INSERT INTO "{self.model_name}" ({_columns}) VALUES ({_insert_data})')
+				_insert_data = ''
+				for key in self.fields:
+					val = item[key]
+					if type(val) is str:
+						_insert_data += f"'{val}',"
+					elif type(val) is dt or type(val) is date:
+						_insert_data += f"'{val.strftime('%Y-%m-%d')}',"
+					else:
+						_insert_data += f"{val},"
+				_insert_data = f'({_insert_data[:-1]}),'
+				data_to_insert +=_insert_data
+			data_to_insert = data_to_insert[:-1]
+
+			print(f'INSERT INTO "{self.model_name}" ({_columns}) VALUES {data_to_insert}')
 			cur.execute(
-				f'INSERT INTO "{self.model_name}" ({_columns}) VALUES ({_insert_data})'
+				f'INSERT INTO "{self.model_name}" ({_columns}) VALUES {data_to_insert}'
 				f'RETURNING {self.colum_id}'
 			)
-			result_ids.append(cur.fetchone()[0])
-
+			result_ids += [val[0] for val in cur.fetchall()]
+		print(result_ids)
 		return result_ids
 
 class User(BaseFakeGenClass):

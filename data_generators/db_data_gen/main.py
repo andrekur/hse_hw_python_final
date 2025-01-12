@@ -18,6 +18,13 @@ CONNECTION = DatabaseCursor(
 	database=CONFIG['DB_POSTGRES_NAME_DB']
 )
 
+COUNT_USERS = int(CONFIG['DATA_GEN_COUNT_USERS'])
+COUNT_PRODUCTS = int(CONFIG['DATA_GEN_COUNT_PRODUCTS'])
+CATEGORIES_WITH_PARENTS = int(CONFIG['DATA_GEN_COUNT_CATEGORIES_WITH_PARENTS'])
+COUNT_ORDERS = int(CONFIG['DATA_GEN_COUNT_ORDERS'])
+ORDER_DETAILS = int(CONFIG['DATA_GEN_COUNT_ORDER_DETAILS'])
+
+
 if __name__ == '__main__':
 	with (
 		CONNECTION._get_conn() as conn,
@@ -25,7 +32,7 @@ if __name__ == '__main__':
 	):
 		try:
 			user = User()
-			user_result = user.gen_data(10) # 10000
+			user_result = user.gen_data(COUNT_USERS)
 			user_ids = user.insert_in_db(cur, user_result)
 
 			pc = ProductCategories()
@@ -33,20 +40,20 @@ if __name__ == '__main__':
 			pc_ids = pc.insert_in_db(cur, pc_result)
 
 			pcp = ProductCategoriesWithParent(pc_ids)
-			pcp_result = pcp.gen_data(10)
+			pcp_result = pcp.gen_data(CATEGORIES_WITH_PARENTS)
 			pcp_ids = pcp.insert_in_db(cur, pcp_result)
 
 			products = Product([*pc_ids, *pcp_ids])
-			products_result = products.gen_data(10)
+			products_result = products.gen_data(COUNT_PRODUCTS)
 			products_ids = products.insert_in_db(cur, products_result)
 
 			orders = Order(user_ids)
-			orders_result = orders.gen_data(6) # 60000
+			orders_result = orders.gen_data(COUNT_ORDERS)
 			orders_ids = orders.insert_in_db(cur, orders_result)
 
 			prepared_product_data = {key:val for key, val in zip(products_ids, products_result )}
 			od = OrderDetails(orders_ids, prepared_product_data)
-			od_result = od.gen_data(8) # 80000
+			od_result = od.gen_data(ORDER_DETAILS)
 			od_ids = od.insert_in_db(cur, od_result)
 
 			conn.commit()

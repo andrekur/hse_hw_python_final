@@ -4,10 +4,10 @@ x-airflow-common:
   &airflow-common
   environment:
     &airflow-common-env
-    AIRFLOW__WEBSERVER__SECRET_KEY: 5ZCItDTk9potGwfrUCa6ceeFCqhvWCxP
-    AIRFLOW__CORE__EXECUTOR: SequentialExecutor
-    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: sqlite:////usr/local/airflow/db/airflow.db
-    AIRFLOW__CORE__LOAD_EXAMPLES: False
+    AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW__WEBSERVER__SECRET_KEY}
+    AIRFLOW__CORE__EXECUTOR: ${AIRFLOW__CORE__EXECUTOR}
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: ${AIRFLOW__DATABASE__SQL_ALCHEMY_CONN}
+    AIRFLOW__CORE__LOAD_EXAMPLES: ${AIRFLOW__CORE__LOAD_EXAMPLES}
 
 x-common:
   &common-volumes
@@ -102,7 +102,7 @@ services:
     restart: always
     environment:
       - SPARK_MODE=worker
-      - SPARK_MASTER_URL=spark://spark:7077
+      - SPARK_MASTER_URL=spark://spark:${SPARK_PORT}
     <<: *common-volumes
     depends_on:
       - spark
