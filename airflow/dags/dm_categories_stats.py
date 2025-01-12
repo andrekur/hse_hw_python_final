@@ -8,9 +8,9 @@ from defaults import DEFAULT_ARGS, DEFAULT_SPARK_SUBMIT_CONF, JARS
 
 
 with DAG(
-	'calc_dm_user_stats',
+	'calc_dm_category_stats',
 	default_args=DEFAULT_ARGS,
-	description='Оverwrite data mart by user stats',
+	description='Оverwrite data mart by category stats',
 	schedule_interval=timedelta(days=1),
 ) as dag:
 
@@ -18,8 +18,8 @@ with DAG(
 	finish = EmptyOperator(task_id='finish')
 
 	spark_submit_task = SparkSubmitOperator(
-		task_id=f'calc_dm_user_stats',
-		application='/opt/airflow/scripts/calc_dm_user_stats.py',
+		task_id=f'calc_dm_category_stats',
+		application='/opt/airflow/scripts/calc_dm_category_stats.py',
 		conn_id='spark_app',
 		conf=DEFAULT_SPARK_SUBMIT_CONF,
 		jars=JARS

@@ -53,9 +53,9 @@ if __name__ == '__main__':
 			cur.execute('select order_id, sum(total_price) from "OrderDetails" od group by order_id')
 			for order_id, total_amount in cur.fetchall():
 				cur.execute(f'UPDATE "Orders" set total_amount = {total_amount} where order_id={order_id}')
-				conn.commit()
-				cur.execute(f'DELETE FROM "Orders" where total_amount = 0')
-				conn.commit()
+			conn.commit()
+			cur.execute(f'DELETE FROM "Orders" where total_amount = 0')
+			conn.commit()
 		except Exception as e:
 			conn.rollback()
 			print(f'Error executing query: {e}')

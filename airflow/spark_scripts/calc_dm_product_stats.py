@@ -6,49 +6,48 @@ from db_conn_conf import ConnectionConfig
 CONFIG = dotenv_values('.env')
 
 
-def recalculate_dm_user_stats(from_db):
+def recalculate_dm_product_stats(from_db):
     """
-    Пересчитывает витрину по тратам пользователей с разбивкой по статусам('Paid', 'Delivery', 'Completed')
-    Показатели:
-        - Кол. заказов
-        - Потрачено всего
-        - Средний чек
+    Пересчитывает витрину по продуктам
+	Показатели:
+		- Выручка по продукту
+        - Продано
+        - Осталось
     """
     spark = SparkSession.builder \
-		.appName('UserStats') \
+		.appName('ProductStats') \
 		.config('spark.jars', '/opt/airflow/spark/jars/postgresql-42.2.18.jar,/opt/airflow/spark/jars/mysql-connector-java-8.3.0.jar') \
 		.getOrCreate()
 
-    users_data = spark.read \
+    products_data = spark.read \
 		.format('jdbc') \
 		.option('url', from_db.conn_url) \
-		.option('dbtable', 'Users') \
+		.option('dbtable', 'Products') \
 		.option('user', from_db.user['login']) \
 		.option('password', from_db.user['passwd']) \
 		.option('driver', from_db.driver) \
 		.load()
 
-    orders_data = spark.read \
+    order_details_data = spark.read \
         .format('jdbc') \
         .option('url', from_db.conn_url) \
-        .option('dbtable', 'Orders') \
+        .option('dbtable', 'OrderDetails') \
         .option('user', from_db.user['login']) \
         .option('password', from_db.user['passwd']) \
         .option('driver', from_db.driver) \
         .load()
 
-    # кол. заказов, общая сумма и средний чек в статусе
-    user_stats =  orders_data.join(users_data, 'user_id') \
-        .groupBy('user_id', 'first_name', 'last_name', 'status') \
-        .agg({'order_id': 'count', 'total_amount': 'sum', 'total_amount': 'avg'}) \
-        .withColumnRenamed('count(order_id)', 'order_count') \
-        .withColumnRenamed('sum(total_amount)', 'total') \
-        .withColumnRenamed('avg(total_amount)', 'avg_check')
+    product_stats =  order_details_data.join(products_data, 'product_id') \
+        .groupBy('product_id', 'name', 'stock_quantity') \
+        .agg({'order_detail_id': 'count', 'total_price': 'sum', 'quantity': 'sum'}) \
+        .withColumnRenamed('count(order_detail_id)', 'order_count') \
+		.withColumnRenamed('sum(quantity)', 'count_quantity_sold') \
+        .withColumnRenamed('sum(total_price)', 'sum_price_sold')
 
-    user_stats.write \
+    product_stats.write \
 		.format('jdbc') \
 		.option('url', from_db.conn_url) \
-		.option('dbtable', 'dm_user_stats') \
+		.option('dbtable', 'dm_product_stats') \
 		.option('user', from_db.user['login']) \
 		.option('password', from_db.user['passwd']) \
 		.option('driver', from_db.driver) \
@@ -68,4 +67,4 @@ if __name__ == "__main__":
 		CONFIG['DB_MYSQL_NAME_DB']
 	)
 
-	recalculate_dm_user_stats(mysql_config)
+	recalculate_dm_product_stats(mysql_config)
